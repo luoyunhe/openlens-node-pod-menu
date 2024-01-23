@@ -6,7 +6,7 @@
 
 
 import React from "react";
-import { Renderer, Common } from "@k8slens/extensions";
+import { Renderer, Common, Main } from "@k8slens/extensions";
 
 type Pod = Renderer.K8sApi.Pod;
 
@@ -29,10 +29,12 @@ const {
 export class PodShellMenu extends React.Component<Renderer.Component.KubeObjectMenuProps<Pod>> {
   async execShell(container?: string) {
     const { object: pod } = this.props;
-
+    const kubeconfigPath = Renderer.Catalog.activeCluster.get().spec.kubeconfigPath
     const kubectlPath = App.Preferences.getKubectlPath() || "kubectl";
     const commandParts = [
       kubectlPath,
+      "--kubeconfig",
+      "\"" + kubeconfigPath + "\"",
       "exec",
       "-i",
       "-t",
@@ -84,7 +86,7 @@ export class PodShellMenu extends React.Component<Renderer.Component.KubeObjectM
         <span className="title">Shell</span>
         {containers.length > 1 && (
           <>
-            <Icon className="arrow" material="keyboard_arrow_right"/>
+            <Icon className="arrow" material="keyboard_arrow_right" />
             <SubMenu>
               {
                 containers.map(container => {
@@ -96,7 +98,7 @@ export class PodShellMenu extends React.Component<Renderer.Component.KubeObjectM
                       onClick={Util.prevDefault(() => this.execShell(name))}
                       className="flex align-center"
                     >
-                      <StatusBrick/>
+                      <StatusBrick />
                       <span>{name}</span>
                     </MenuItem>
                   );
